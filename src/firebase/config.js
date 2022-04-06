@@ -18,3 +18,4 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 export const db = firebase.firestore();
 export const auth = firebase.auth()
+export const timestamp= firebase.firestore.Timestamp
