@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "../firebase/config";
 
-export const useCollection = (collection, _query) => {
+export const useCollection = (collection, _query, _orderBy) => {
   const [error, setError] = useState(null);
   const [documents, setDocuments] = useState(null);
 
@@ -9,11 +9,15 @@ export const useCollection = (collection, _query) => {
   /* if we dont use ref --> infinite loop in useEffect 
     query is an array and is "diferent" in every function call */
   const query = useRef(_query).current;
+  const orderBy = useRef(_orderBy).current;
 
   useEffect(() => {
     let ref = db.collection(collection);
     if (query) {
       ref = ref.where(...query);
+    }
+    if (orderBy){
+      ref=ref.orderBy(...orderBy)
     }
 
     const unsubscribe = ref.onSnapshot(
@@ -34,7 +38,7 @@ export const useCollection = (collection, _query) => {
       }
     );
     return () => unsubscribe();
-  }, [collection, query]);
+  }, [collection, query, orderBy]);
 
   return { documents, error };
 };

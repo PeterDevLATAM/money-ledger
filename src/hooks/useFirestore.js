@@ -10,13 +10,22 @@ let inititalState = {
 const firestoreReducer = (state, action) => {
   switch (action.type) {
     case "IS_PENDING":
-      return { ...inititalState, isPending: true };
+      const a = { ...inititalState, isPending: true };
+      console.log(a);
+      return a;
     case "ERROR":
       return { ...inititalState, error: action.payload };
     case "ADDED_DOCUMENT":
       return {
         ...state,
         document: action.payload,
+        isPending: false,
+        success: true,
+        error: null,
+      };
+    case "DELETED_DOCUMENT":
+      return {
+        ...state,
         isPending: false,
         success: true,
         error: null,
@@ -42,21 +51,32 @@ export const useFirestore = (collection) => {
 
   //add a document
   const addDocument = async (doc) => {
+    dispatchIfNotCancelled({
+      type: "IS_PENDING",
+    });
     try {
-      const createdAt= timestamp.fromDate(new Date())
-      const addedDocument = await ref.add({...doc, createdAt});  
+      const createdAt = timestamp.fromDate(new Date());
+      const addedDocument = await ref.add({ ...doc, createdAt });
       dispatchIfNotCancelled({
         type: "ADDED_DOCUMENT",
         payload: addedDocument,
       });
     } catch (error) {
-        dispatchIfNotCancelled({type:'ERROR', payload: error.message})
+      dispatchIfNotCancelled({ type: "ERROR", payload: error.message });
     }
   };
 
   //delete a document
   const deleteDocument = async (id) => {
-    //
+    dispatch({ type: "IS_PENDING" });
+    try {
+      ref.doc(id).delete();
+      dispatchIfNotCancelled({
+        type: "DELETED_DOCUMENT",
+      });
+    } catch (error) {
+      dispatchIfNotCancelled({ type: "ERROR", payload: "Couldn't delete" });
+    }
   };
 
   //cleanUp functions
