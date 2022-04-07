@@ -6,6 +6,7 @@ import { useAuthContext } from "../../hooks/useAuthContext";
 import { useCollection } from "../../hooks/useCollection";
 
 export default function Home() {
+  //We pased user and docs as props to children components
   const { user } = useAuthContext();
   const { documents, error } = useCollection(
     "transactions",
